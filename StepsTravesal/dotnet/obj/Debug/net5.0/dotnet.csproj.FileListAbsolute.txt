@@ -1,0 +1,16 @@
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/dotnet
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/dotnet.deps.json
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/dotnet.runtimeconfig.json
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/dotnet.runtimeconfig.dev.json
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/dotnet.dll
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/ref/dotnet.dll
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/bin/Debug/net5.0/dotnet.pdb
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.csproj.AssemblyReference.cache
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.GeneratedMSBuildEditorConfig.editorconfig
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.AssemblyInfoInputs.cache
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.AssemblyInfo.cs
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.csproj.CoreCompileInputs.cache
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.dll
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/ref/dotnet.dll
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.pdb
+/home/dibba/Work/github/language-performance-tests/StepsTravesal/dotnet/obj/Debug/net5.0/dotnet.genruntimeconfig.cache
