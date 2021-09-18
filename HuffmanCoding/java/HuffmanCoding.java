@@ -1,40 +1,8 @@
-/******************************************************************************
- *  Compilation:  javac Huffman.java
- *  Execution:    java Huffman - < input.txt   (compress)
- *  Execution:    java Huffman + < input.txt   (expand)
- *  Dependencies: BinaryIn.java BinaryOut.java
- *  Data files:   https://algs4.cs.princeton.edu/55compression/abra.txt
- *                https://algs4.cs.princeton.edu/55compression/tinytinyTale.txt
- *                https://algs4.cs.princeton.edu/55compression/medTale.txt
- *                https://algs4.cs.princeton.edu/55compression/tale.txt
- *
- *  Compress or expand a binary input stream using the Huffman algorithm.
- *
- *  % java Huffman - < abra.txt | java BinaryDump 60
- *  010100000100101000100010010000110100001101010100101010000100
- *  000000000000000000000000000110001111100101101000111110010100
- *  120 bits
- *
- *  % java Huffman - < abra.txt | java Huffman +
- *  ABRACADABRA!
- *
- ******************************************************************************/
+
 import java.util.*;
 import java.io.*;
 import java.time.*;
 
-/**
- *  The {@code Huffman} class provides static methods for compressing
- *  and expanding a binary input using Huffman codes over the 8-bit extended
- *  ASCII alphabet.
- *  <p>
- *  For additional documentation,
- *  see <a href="https://algs4.cs.princeton.edu/55compression">Section 5.5</a> of
- *  <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
- *
- *  @author Robert Sedgewick
- *  @author Kevin Wayne
- */
 public class HuffmanCoding {
 
     // alphabet size of extended ASCII

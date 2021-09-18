@@ -15,5 +15,5 @@ func main() {
 	start := time.Now()
 	fmt.Println(jump(30))
 	elapsed := time.Since(start)
-    	fmt.Println("Took ", elapsed)
+    fmt.Println("Took ", elapsed)
 }
