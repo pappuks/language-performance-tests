@@ -116,8 +116,6 @@ func compress(chars []rune) (root *Node, compressed []bool) {
 		}
 	}
 
-	fmt.Println("Compressed length: ", len(compressed)/8)
-
 	return
 }
 
@@ -154,9 +152,15 @@ func main() {
 
 	fmt.Println("Input ", len(chars))
 
+	elapsedFile := time.Since(start)
+	fmt.Println("File Read Took ", elapsedFile)
+
 	root, compressed := compress(chars)
 
 	fmt.Println("Compressed length: ", len(compressed)/8)
+
+	elapsedCompress := time.Since(start)
+	fmt.Println("Compress Took ", elapsedCompress)
 
 	output := expand(root, compressed, len(chars))
 
@@ -165,5 +169,5 @@ func main() {
 	}
 
 	elapsed := time.Since(start)
-	fmt.Println("Took ", elapsed)
+	fmt.Println("Total Took ", elapsed)
 }
