@@ -89,13 +89,6 @@ public class HuffmanCoding {
         String[] st = new String[R];
         buildCode(st, root, "");
         
-        //Arrays.stream(st).forEach(str -> {if (str != null) System.out.println(str);});
-
-        // print trie for decoder
-        //writeTrie(root);
-
-        // print number of bytes in original uncompressed message
-        //BinaryStdOut.write(input.length);
         length = input.length;
         
         compressed = new ArrayList<>();
@@ -105,19 +98,15 @@ public class HuffmanCoding {
             String code = st[input[i]];
             for (int j = 0; j < code.length(); j++) {
                 if (code.charAt(j) == '0') {
-                    //BinaryStdOut.write(false);
                     compressed.add(false);
                 }
                 else if (code.charAt(j) == '1') {
-                    //BinaryStdOut.write(true);
                     compressed.add(true);
                 }
                 else throw new IllegalStateException("Illegal state");
             }
         }
 
-        // close output stream
-        //BinaryStdOut.close();
         System.out.println("Input length:" + length + " Compressed:" + compressed.size()/8);
         return s;
     }
@@ -126,11 +115,9 @@ public class HuffmanCoding {
     private Node buildTrie(int[] freq) {
 
         // initialze priority queue with singleton trees
-        //MinPQ<Node> pq = new MinPQ<Node>();
         PriorityQueue<Node> pq = new PriorityQueue<>();
         for (char c = 0; c < R; c++) {
             if (freq[c] > 0) {
-            //System.out.println("Adding:" + c + " " + freq[c]);
                 pq.add(new Node(c, freq[c], null, null));
             }
         }
@@ -144,19 +131,6 @@ public class HuffmanCoding {
         }
         return pq.remove();
     }
-
-
-    // write bitstring-encoded trie to standard output
-    /*private void writeTrie(Node x) {
-        if (x.isLeaf()) {
-            BinaryStdOut.write(true);
-            BinaryStdOut.write(x.ch, 8);
-            return;
-        }
-        BinaryStdOut.write(false);
-        writeTrie(x.left);
-        writeTrie(x.right);
-    }*/
 
     // make a lookup table from symbols and their encodings
     private void buildCode(String[] st, Node x, String s) {
@@ -176,10 +150,8 @@ public class HuffmanCoding {
     public String expand() {
 
         // read in Huffman trie from input stream
-        Node root = trie;//readTrie(); 
+        Node root = trie;
 
-        // number of bytes to write
-        //int length = BinaryStdIn.readInt();
         Iterator<Boolean> iter = compressed.iterator();
         StringBuilder output = new StringBuilder();
 
@@ -191,23 +163,11 @@ public class HuffmanCoding {
                 if (bit) x = x.right;
                 else     x = x.left;
             }
-            //BinaryStdOut.write(x.ch, 8);
             output.append(x.ch);
         }
-        //BinaryStdOut.close();
         return output.toString();
     }
 
-
-    /*private Node readTrie() {
-        boolean isLeaf = BinaryStdIn.readBoolean();
-        if (isLeaf) {
-            return new Node(BinaryStdIn.readChar(), -1, null, null);
-        }
-        else {
-            return new Node('\0', -1, readTrie(), readTrie());
-        }
-    }*/
 
     /**
      * Sample client that calls {@code compress()} if the command-line
