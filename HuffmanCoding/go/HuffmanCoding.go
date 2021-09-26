@@ -143,7 +143,7 @@ func expand(root *Node, compressed []bool, length int) string {
 
 func main() {
 	start := time.Now()
-	content, err := ioutil.ReadFile("tale.txt") // the file is inside the local directory
+	content, err := ioutil.ReadFile("bible.txt") // the file is inside the local directory
 	if err != nil {
 		fmt.Println("Err")
 	}

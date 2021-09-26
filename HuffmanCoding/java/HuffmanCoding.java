@@ -175,7 +175,7 @@ public class HuffmanCoding {
     public static void main(String[] args) {
         HuffmanCoding hc = new HuffmanCoding();
         Instant start = Instant.now();
-        String input = hc.compress("tale.txt");
+        String input = hc.compress("bible.txt");
         String expanded = hc.expand();
         if (!input.equals(expanded))
             throw new IllegalArgumentException("Strings dont match");

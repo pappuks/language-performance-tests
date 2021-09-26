@@ -148,7 +148,7 @@ int main()
     Node* root;
     vector<bool>* compressed;
 
-    string fileContent = get_file_contents("tale.txt");
+    string fileContent = get_file_contents("bible.txt");
     const char * chars = fileContent.c_str();
     int inputLength = fileContent.length();
 

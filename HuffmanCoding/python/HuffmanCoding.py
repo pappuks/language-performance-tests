@@ -100,7 +100,7 @@ def expand(compressed, root, inputLength):
 
 def main():
     start = time.time()
-    fileObject = open("tale.txt", "r")
+    fileObject = open("bible.txt", "r")
     data = fileObject.read()
     chars = list(data)
     inputLength = chars.__len__()
