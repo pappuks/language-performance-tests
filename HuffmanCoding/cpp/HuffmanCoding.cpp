@@ -111,7 +111,7 @@ void compress(const char * chars, int inputLength, Node** root, vector<bool>** c
 }
 
 string expand(int inputLength, Node* root, vector<bool>* compressed) {
-    char* output = new char[inputLength];
+    char* output = new char[inputLength + 1];
 
     int j = 0;
     for (int i = 0; i < inputLength; i++) {
@@ -126,6 +126,8 @@ string expand(int inputLength, Node* root, vector<bool>* compressed) {
         }
         output[i] = x->ch;
     }
+    output[inputLength] = '\0';
+
     return string(output);
 }
 
@@ -161,6 +163,9 @@ int main()
 	std::cout << "Time Compress = " << std::chrono::duration_cast<std::chrono::microseconds>(endCompress - begin).count() << "[µs]" << std::endl;
 
     string expanded = expand(inputLength, root, compressed);
+
+    cout << fileContent.length() << ' ' << expanded.length() << endl;
+    
     if (fileContent.compare(expanded) == 0) {
         cout << "Success" << endl;
     }
