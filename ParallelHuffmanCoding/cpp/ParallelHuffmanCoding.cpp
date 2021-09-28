@@ -89,14 +89,11 @@ CompressedOutput compress(const char * chars, int index, int inputLength, string
     vector<bool>* compressed = new vector<bool>();
 
     float div8 = float(inputLength) / 8;
-
     int start = index * int(div8);
     int end = (index + 1) * int(div8);
-
     if (index == 7) {
         end = inputLength;
     }
-
     for (int i = start; i < end; i++) {
         string code = st[chars[i]];
         const char * codeCh = code.c_str();
@@ -108,13 +105,11 @@ CompressedOutput compress(const char * chars, int index, int inputLength, string
             }
         }
     }
-
     cout << "Input size:" << end - start << " Compressed:" << (compressed)->size()/8 << endl;
 
     CompressedOutput retVal;
     retVal.compressed = compressed;
     retVal.inputLength = end - start;
-
     return retVal;
 }
 
@@ -163,61 +158,55 @@ void cleanupNode(Node * x) {
     delete x;
 }
 
+void printTime(chrono::steady_clock::time_point begin, string text) {
+    chrono::steady_clock::time_point endFile = chrono::steady_clock::now();
+	cout << text << chrono::duration_cast<chrono::microseconds>(endFile - begin).count() << "[µs]" << endl;
+}
+
+vector<CompressedOutput> compressParallel(const char * chars, int inputLength, Node** root, string** st) {
+    buildTrieAndCode(chars, inputLength, root,st);
+    vector<future<CompressedOutput>> futures;
+    for (int i = 0; i < 8; i++) {
+        futures.push_back(async(compress, chars, i, inputLength, *st));
+    }
+    vector<CompressedOutput> compressedOutputs;
+    for (int i = 0; i < 8; i++) {
+        compressedOutputs.push_back(futures.at(i).get());
+    }
+    return compressedOutputs;
+}
+
+void expandParallel(vector<CompressedOutput> compressedOutputs, Node* root, string fileContent) {
+    vector<future<string>> expandFutures;
+    for (int i = 0; i < 8; i++) {
+        expandFutures.push_back(async(expand, compressedOutputs.at(i).inputLength, root, compressedOutputs.at(i).compressed));
+    }
+    string expanded;
+    for (int i = 0; i < 8; i++) {
+        expanded += expandFutures.at(i).get();
+    }
+    cout << fileContent.length() << ' ' << expanded.length() << endl;
+    if (fileContent.compare(expanded) == 0) {
+        cout << "Success" << endl;
+    }
+}
+
 int main()
 {
-    chrono::steady_clock::time_point begin = chrono::steady_clock::now();	
-    
     Node* root;
     vector<bool>* compressed;
+    string* st;
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
     string fileContent = get_file_contents("bible.txt");
     const char * chars = fileContent.c_str();
     int inputLength = fileContent.length();
-
-    chrono::steady_clock::time_point endFile = chrono::steady_clock::now();
-	cout << "Time File Read = " << chrono::duration_cast<chrono::microseconds>(endFile - begin).count() << "[µs]" << endl;
-
-    string* st;
-
-    buildTrieAndCode(chars, inputLength, &root,&st);
-
-    vector<future<CompressedOutput>> futures;
-
-    for (int i = 0; i < 8; i++) {
-        futures.push_back(async(compress, chars, i, inputLength, st));
-    }
-
-    vector<CompressedOutput> compressedOutputs;
-
-    for (int i = 0; i < 8; i++) {
-        compressedOutputs.push_back(futures.at(i).get());
-    }
-
-    chrono::steady_clock::time_point endCompress = chrono::steady_clock::now();
-	cout << "Time Compress = " << chrono::duration_cast<chrono::microseconds>(endCompress - begin).count() << "[µs]" << endl;
-
-    vector<future<string>> expandFutures;
-
-    for (int i = 0; i < 8; i++) {
-        expandFutures.push_back(async(expand, compressedOutputs.at(i).inputLength, root, compressedOutputs.at(i).compressed));
-    }
-
-    string expanded;
-
-    for (int i = 0; i < 8; i++) {
-        expanded += expandFutures.at(i).get();
-    }
-
-    cout << fileContent.length() << ' ' << expanded.length() << endl;
-
-    if (fileContent.compare(expanded) == 0) {
-        cout << "Success" << endl;
-    }
+    printTime(begin, "Time File Read = ");
+    vector<CompressedOutput> compressedOutputs = compressParallel(chars, inputLength, &root, &st);
+    printTime(begin, "Time Compress = ");
+    expandParallel(compressedOutputs, root, fileContent);
+    printTime(begin, "Time difference = ");
 
     delete compressed;
     cleanupNode(root);
-
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-	cout << "Time difference = " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "[µs]" << endl;
-    
 }

@@ -1,4 +1,7 @@
 import java.util.*;
+import java.util.stream.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.io.*;
 import java.time.*;
 
@@ -10,7 +13,7 @@ public class ParallelHuffmanCoding {
 
     private int length;
 
-    private ArrayList<Boolean> compressed;
+    private String fileContent;
 
     // Huffman trie node
     private static class Node implements Comparable<Node> {
@@ -34,6 +37,16 @@ public class ParallelHuffmanCoding {
         // compare, based on frequency
         public int compareTo(Node that) {
             return this.freq - that.freq;
+        }
+    }
+
+    private static class CompressedOutput {
+        ArrayList<Boolean> compressed;
+        int inputLength;
+
+        CompressedOutput(ArrayList<Boolean> c, int i) {
+            compressed = c;
+            inputLength = i;
         }
     }
 
@@ -67,9 +80,37 @@ public class ParallelHuffmanCoding {
      * Huffman codes with an 8-bit alphabet; and writes the results to standard
      * output.
      */
-    public String compress(String name) {
+    public CompressedOutput compress(char[] input, String[] st, int index) {
+        
+        ArrayList<Boolean> compressed = new ArrayList<>();
+
+        float div8 = (float)length / 8;
+        int start = index * (int)div8;
+        int end = (index + 1) * (int)div8;
+        if (index == 7) {
+            end = length;
+        }
+
+        for (int i = start; i < end; i++) {
+            String code = st[input[i]];
+            for (int j = 0; j < code.length(); j++) {
+                if (code.charAt(j) == '0') {
+                    compressed.add(false);
+                } else if (code.charAt(j) == '1') {
+                    compressed.add(true);
+                } else
+                    throw new IllegalStateException("Illegal state");
+            }
+        }
+
+        System.out.println("Input length:" + (end - start) + " Compressed:" + compressed.size() / 8);
+        return new CompressedOutput(compressed, end - start);
+    }
+
+    public List<CompressedOutput> compressParallel(String name) {
         // read the input
         String s = readFile(name);
+        fileContent = s;
         char[] input = s.toCharArray();
 
         // tabulate frequency counts
@@ -87,23 +128,22 @@ public class ParallelHuffmanCoding {
 
         length = input.length;
 
-        compressed = new ArrayList<>();
+        List<CompletableFuture<CompressedOutput>> compressFutures = new ArrayList<>();
+        
+        IntStream.range(0, 8).forEach(i -> {
+            compressFutures.add(CompletableFuture.supplyAsync(() -> compress(input, st, i)));
+        });
 
-        // use Huffman code to encode input
-        for (int i = 0; i < input.length; i++) {
-            String code = st[input[i]];
-            for (int j = 0; j < code.length(); j++) {
-                if (code.charAt(j) == '0') {
-                    compressed.add(false);
-                } else if (code.charAt(j) == '1') {
-                    compressed.add(true);
-                } else
-                    throw new IllegalStateException("Illegal state");
-            }
+        return compressFutures.stream().map(f -> getFuture(f)).collect(Collectors.toList());
+    }
+
+    static <T> T getFuture(CompletableFuture<T> f) {
+        try {
+            return f.get();
+        } catch (Exception ex) {
+
         }
-
-        System.out.println("Input length:" + length + " Compressed:" + compressed.size() / 8);
-        return s;
+        return null;
     }
 
     // build the Huffman trie given frequencies
@@ -141,16 +181,16 @@ public class ParallelHuffmanCoding {
      * Reads a sequence of bits that represents a Huffman-compressed message from
      * standard input; expands them; and writes the results to standard output.
      */
-    public String expand() {
+    public String expand(CompressedOutput input) {
 
         // read in Huffman trie from input stream
         Node root = trie;
 
-        Iterator<Boolean> iter = compressed.iterator();
+        Iterator<Boolean> iter = input.compressed.iterator();
         StringBuilder output = new StringBuilder();
 
         // decode using the Huffman trie
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < input.inputLength; i++) {
             Node x = root;
             while (!x.isLeaf()) {
                 boolean bit = iter.next();// BinaryStdIn.readBoolean();
@@ -164,6 +204,14 @@ public class ParallelHuffmanCoding {
         return output.toString();
     }
 
+    public String expandParallel(List<CompressedOutput> inputs) {
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+
+        futures = inputs.stream().map(i -> CompletableFuture.supplyAsync(() -> expand(i))).collect(Collectors.toList());
+
+        return futures.stream().map(f -> getFuture(f)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
+    }
+
     /**
      * Sample client that calls {@code compress()} if the command-line argument is
      * "-" an {@code expand()} if it is "+".
@@ -173,9 +221,9 @@ public class ParallelHuffmanCoding {
     public static void main(String[] args) {
         ParallelHuffmanCoding hc = new ParallelHuffmanCoding();
         Instant start = Instant.now();
-        String input = hc.compress("bible.txt");
-        String expanded = hc.expand();
-        if (!input.equals(expanded))
+        List<CompressedOutput> inputs = hc.compressParallel("bible.txt");
+        String expanded = hc.expandParallel(inputs);
+        if (!hc.fileContent.equals(expanded))
             throw new IllegalArgumentException("Strings dont match");
         Instant end = Instant.now();
         System.out.println(Duration.between(start, end));

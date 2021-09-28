@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"io/ioutil"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -160,7 +161,18 @@ func expand(root *Node, compressed []bool, length int, index int, out chan Uncom
 	out <- UncompressedPart{output: builder.String(), index: index}
 }
 
+func printStats(mem runtime.MemStats) {
+	runtime.ReadMemStats(&mem)
+	fmt.Println("mem.Alloc:", mem.Alloc)
+	fmt.Println("mem.TotalAlloc:", mem.TotalAlloc)
+	fmt.Println("mem.HeapAlloc:", mem.HeapAlloc)
+	fmt.Println("mem.NumGC:", mem.NumGC)
+	fmt.Println("-----")
+}
+
 func main() {
+	var mem runtime.MemStats
+	printStats(mem)
 	start := time.Now()
 	content, err := ioutil.ReadFile("bible.txt") // the file is inside the local directory
 	if err != nil {
@@ -237,4 +249,5 @@ func main() {
 
 	elapsed := time.Since(start)
 	fmt.Println("Total Took ", elapsed)
+	printStats(mem)
 }
