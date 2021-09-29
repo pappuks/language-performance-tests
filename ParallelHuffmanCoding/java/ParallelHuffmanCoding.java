@@ -1,6 +1,6 @@
 import java.util.*;
 import java.util.stream.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.io.*;
 import java.time.*;
@@ -14,6 +14,8 @@ public class ParallelHuffmanCoding {
     private int length;
 
     private String fileContent;
+
+    private Executor executor = Executors.newFixedThreadPool(8);
 
     // Huffman trie node
     private static class Node implements Comparable<Node> {
@@ -131,7 +133,7 @@ public class ParallelHuffmanCoding {
         List<CompletableFuture<CompressedOutput>> compressFutures = new ArrayList<>();
         
         IntStream.range(0, 8).forEach(i -> {
-            compressFutures.add(CompletableFuture.supplyAsync(() -> compress(input, st, i)));
+            compressFutures.add(CompletableFuture.supplyAsync(() -> compress(input, st, i), executor));
         });
 
         return compressFutures.stream().map(f -> getFuture(f)).collect(Collectors.toList());
@@ -207,9 +209,13 @@ public class ParallelHuffmanCoding {
     public String expandParallel(List<CompressedOutput> inputs) {
         List<CompletableFuture<String>> futures = new ArrayList<>();
 
-        futures = inputs.stream().map(i -> CompletableFuture.supplyAsync(() -> expand(i))).collect(Collectors.toList());
+        futures = inputs.stream().map(i -> CompletableFuture.supplyAsync(() -> expand(i), executor)).collect(Collectors.toList());
 
         return futures.stream().map(f -> getFuture(f)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
+    }
+
+    public void stop() {
+        ((ThreadPoolExecutor)executor).shutdown();
     }
 
     /**
@@ -227,5 +233,6 @@ public class ParallelHuffmanCoding {
             throw new IllegalArgumentException("Strings dont match");
         Instant end = Instant.now();
         System.out.println(Duration.between(start, end));
+        hc.stop();
     }
 }
